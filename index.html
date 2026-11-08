@@ -104,7 +104,9 @@ function testSheet(){
     if(t.trim()==='ok'){S.err='';S.msg='The script answered "ok". Open your sheet: a TEST row should be there.'}
     else{S.msg='';S.err='The link answered, but the script did not return "ok": '+t.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').slice(0,200)}
     render()
-  }).catch(e=>{S.msg='';S.err='Could not reach the Web App. Check that "Who has access" is set to Anyone, and that you deployed a new version. ('+e.message+')';render()});
+  }).catch(e=>{
+    fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body}).then(()=>{S.err='';S.msg='The test row was sent, but the browser cannot read the answer from here. Open your sheet: if a TEST row appeared, everything works.';render()}).catch(e2=>{S.msg='';S.err='Could not reach the Web App at all. If you are testing from the claude.ai link, that is expected (it blocks outside connections): test from a file on your device or a normal hosting site. ('+e2.message+')';render()});
+  });
 }
 async function saveFile(name,text,type){
   try{if(window.claude&&window.claude.use){const d=await window.claude.use('downloads');if(d){await d.save({filename:name,data:text});return}}}catch(e){return}
